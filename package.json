@@ -1,0 +1,17 @@
+{
+  "name": "rsshop-autopost",
+  "version": "1.0.0",
+  "private": true,
+  "description": "RSSHOP AutoPost Android application",
+  "scripts": {
+    "build": "echo Web assets ready",
+    "android": "cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/core": "^7.4.3",
+    "@capacitor/android": "^7.4.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.3"
+  }
+}
