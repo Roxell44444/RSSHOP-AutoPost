@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0d0d0f"><title>RSSHOP AutoPost</title>
+<style>
+:root{color-scheme:dark;--red:#e21c3a;--bg:#0d0d0f;--panel:#19191e;--line:#303038;--muted:#a5a5ad}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#f7f7f8;font:15px system-ui,-apple-system,sans-serif;padding:env(safe-area-inset-top) 14px env(safe-area-inset-bottom)}
+header{display:flex;align-items:center;gap:12px;padding:20px 4px 18px;border-bottom:1px solid var(--line)}
+.logo{background:var(--red);border-radius:12px;padding:11px 13px;font-weight:950;font-size:20px}h1{font-size:18px;margin:0;letter-spacing:.4px}.sub,.muted,small{color:var(--muted)}.sub{font-size:12px;margin-top:3px}
+main{max-width:760px;margin:0 auto}.hero{padding:20px 4px 8px}.eyebrow{color:#ff6b80;font-size:11px;letter-spacing:1.5px;font-weight:800}.hero h2{font-size:27px;line-height:1.1;margin:7px 0}.hero p{color:var(--muted);line-height:1.5;margin:7px 0}
+.notice{background:#25151a;border-left:3px solid var(--red);padding:12px;border-radius:8px;font-size:13px;line-height:1.45;margin:14px 0}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin:14px 0}.stat,.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}.stat span{display:block;color:var(--muted);font-size:12px}.stat strong{font-size:24px}
+nav{display:flex;overflow:auto;gap:7px;padding:5px 0 13px}.tab{white-space:nowrap;background:#24242b;color:#ddd;border:1px solid var(--line);border-radius:10px;padding:11px 13px;font-weight:750}.tab.active{background:var(--red);border-color:var(--red);color:white}
+.panel{display:none}.panel.active{display:block}.heading{display:flex;align-items:center;justify-content:space-between;margin:14px 2px 10px}.heading h3{margin:0;font-size:19px}
+label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
+input,textarea{width:100%;background:#101014;color:white;border:1px solid #41414a;border-radius:10px;padding:12px;font:inherit;min-width:0}
+input[type=checkbox]{width:18px;height:18px;accent-color:var(--red)}input[type=file]{font-size:13px}
+textarea{resize:vertical}button{font:inherit;font-weight:750;border:0;border-radius:10px;background:var(--red);color:white;padding:12px 14px;cursor:pointer}.secondary{background:#33333c}.danger{background:#57212b}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.actions button{flex:1}
+.checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:8px 0}.check{display:flex;align-items:center;gap:8px;background:#111115;border:1px solid #36363d;border-radius:9px;padding:9px;font-size:13px}
+.item{border-top:1px solid var(--line);padding:13px 0}.item:first-child{border:0}.item strong{display:block}.item p{margin:6px 0;color:var(--muted);white-space:pre-wrap;overflow-wrap:anywhere}.pill{display:inline-block;background:#35353e;color:#ddd;padding:4px 8px;border-radius:99px;font-size:10px;font-weight:800;margin:5px 5px 0 0}
+.preview{display:flex;gap:8px;overflow:auto;margin-top:8px}.preview img,.preview video{width:74px;height:74px;object-fit:cover;border-radius:9px;background:#111}
+.empty{color:var(--muted);font-size:13px;padding:16px 0}.tiny{font-size:12px;color:var(--muted);line-height:1.45}
+footer{color:var(--muted);font-size:11px;text-align:center;padding:24px 8px}
+@media(min-width:600px){.stats{grid-template-columns:repeat(4,1fr)}}
+</style></head>
+<body>
+<header><div class="logo">RS</div><div><h1>RSSHOP AUTOPOST</h1><div class="sub">Centro de campañas · LAS TUNAS</div></div></header>
+<main>
+<section class="hero"><div class="eyebrow">TU NEGOCIO, ORGANIZADO</div><h2>Publica con más orden.<br><span style="color:#ff536d">Vende con constancia.</span></h2><p>Prepara tus anuncios, organiza tus grupos y lleva el control de cada publicación.</p></section>
+<div class="notice"><b>Importante:</b> la publicación en grupos se prepara para que la confirmes manualmente. Meta no ofrece actualmente la API oficial para publicar automáticamente en grupos. Esta versión guarda tus campañas en el dispositivo.</div>
+<section class="stats">
+<div class="stat"><span>Grupos</span><strong id="s-groups">0</strong></div><div class="stat"><span>Campañas</span><strong id="s-campaigns">0</strong></div><div class="stat"><span>Pendientes</span><strong id="s-pending">0</strong></div><div class="stat"><span>Publicadas</span><strong id="s-done">0</strong></div>
+</section>
+<nav><button class="tab active" data-tab="compose">Nueva campaña</button><button class="tab" data-tab="queue">Cola de publicaciones</button><button class="tab" data-tab="groups">Mis grupos</button><button class="tab" data-tab="backup">Datos y ayuda</button></nav>
+<section class="panel active" id="p-compose">
+<div class="heading"><h3>Nueva campaña</h3><span class="pill">ASISTIDA</span></div>
+<form id="campaign" class="card">
+<label for="title">Nombre del producto / campaña</label><input id="title" maxlength="90" required placeholder="Ej. Tenis deportivos nuevos">
+<label for="message">Texto del anuncio</label><textarea id="message" maxlength="5000" rows="5" required placeholder="Escribe precio, tallas, detalles y contacto..."></textarea><div class="tiny" id="count">0 / 5000</div>
+<label for="media">Fotos o vídeos del producto</label><input id="media" type="file" accept="image/*,video/*" multiple><div id="media-preview" class="preview"></div>
+<label>Grupos donde prepararás la publicación</label><div class="actions" style="margin:4px 0"><button type="button" class="secondary" id="select-all">Seleccionar todos</button></div><div id="campaign-groups" class="checks"><div class="empty">Añade tus grupos primero.</div></div>
+<label for="when">Fecha y hora de recordatorio (opcional)</label><input id="when" type="datetime-local"><p class="tiny">Es un recordatorio dentro de la aplicación; no publica automáticamente ni se ejecuta con el teléfono apagado.</p>
+<button type="submit" style="width:100%;margin-top:12px">Guardar campaña</button>
+</form>
+</section>
+<section class="panel" id="p-queue">
+<div class="heading"><h3>Cola de publicaciones</h3><span class="pill">MANUAL</span></div><div id="queue" class="card"><div class="empty">Todavía no hay publicaciones en cola.</div></div>
+</section>
+<section class="panel" id="p-groups">
+<div class="heading"><h3>Mis grupos</h3><span class="pill">SIN LÍMITE FIJO</span></div>
+<form id="group-form" class="card"><label for="gname">Nombre del grupo</label><input id="gname" required placeholder="Ej. Compra y venta Las Tunas"><label for="gurl">Enlace del grupo de Facebook</label><input id="gurl" type="url" required placeholder="https://www.facebook.com/groups/..."><button type="submit" style="width:100%;margin-top:12px">Añadir grupo</button></form>
+<div id="groups-list" class="card" style="margin-top:12px"><div class="empty">No has añadido grupos.</div></div>
+</section>
+<section class="panel" id="p-backup">
+<div class="heading"><h3>Datos y ayuda</h3></div>
+<div class="card"><b>Respaldo de campañas</b><p class="tiny">Exporta tus grupos, anuncios y archivos para conservarlos al cambiar de dispositivo.</p><div class="actions"><button id="export">Exportar respaldo</button><button class="secondary" id="choose-import">Importar respaldo</button></div><input id="import-file" type="file" accept="application/json" hidden><div class="tiny" id="backup-msg" style="margin-top:8px"></div></div>
+<div class="card" style="margin-top:12px"><b>Publicación automática en una Página</b><p class="tiny">La automatización en una Página de Facebook requiere alojar y configurar el servidor, crear una aplicación en Meta for Developers y obtener los permisos oficiales. Esta compilación no tiene esa conexión habilitada todavía. No introduzcas aquí tu contraseña, cookies ni códigos de Facebook.</p></div>
+<div class="card" style="margin-top:12px"><b>Consejos</b><p class="tiny">Comprueba las normas de cada grupo antes de publicar. La app abre el grupo y prepara el texto, pero tú debes revisar el contenido, adjuntar las fotos y confirmar la publicación.</p></div>
+</section>
+<footer>RSSHOP AUTOPOST · Tus datos se guardan localmente en este dispositivo.</footer>
+</main>
+<script>
+const DB='rsshop-autopost-android',VERSION=1;let db,chosenFiles=[];
+const $=id=>document.getElementById(id);
+function openDb(){return new Promise((resolve,reject)=>{const r=indexedDB.open(DB,VERSION);r.onupgradeneeded=()=>{const d=r.result;['groups','campaigns','tasks'].forEach(n=>{if(!d.objectStoreNames.contains(n))d.createObjectStore(n,{keyPath:'id'});});};r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});}
+function request(r){return new Promise((resolve,reject)=>{r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});}
+function all(n){return request(db.transaction(n).objectStore(n).getAll());}
+function put(n,v){return request(db.transaction(n,'readwrite').objectStore(n).put(v));}
+function remove(n,id){return request(db.transaction(n,'readwrite').objectStore(n).delete(id));}
+function id(){return Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);}
+function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function toast(s){$('backup-msg').textContent=s;}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id==='p-'+b.dataset.tab));}));
+$('message').addEventListener('input',()=>{$('count').textContent=$('message').value.length+' / 5000';});
+$('media').addEventListener('change',()=>{chosenFiles=Array.from($('media').files||[]);$('media-preview').innerHTML='';chosenFiles.forEach(f=>{const u=URL.createObjectURL(f);const el=document.createElement(f.type.startsWith('image/')?'img':'video');el.src=u;if(el.tagName==='VIDEO')el.muted=true;$('media-preview').appendChild(el);});});
+async function render(){
+ const [gs,cs,ts]=await Promise.all([all('groups'),all('campaigns'),all('tasks')]);
+ $('s-groups').textContent=gs.length;$('s-campaigns').textContent=cs.length;$('s-pending').textContent=ts.filter(t=>t.status!=='done').length;$('s-done').textContent=ts.filter(t=>t.status==='done').length;
+ $('campaign-groups').innerHTML=gs.length?gs.map(g=>'<label class="check"><input type="checkbox" value="'+esc(g.id)+'"><span>'+esc(g.name)+'</span></label>').join(''):'<div class="empty">Añade tus grupos primero.</div>';
+ $('groups-list').innerHTML=gs.length?gs.map(g=>'<article class="item"><strong>'+esc(g.name)+'</strong><p>'+esc(g.url)+'</p><div class="actions"><a href="'+esc(g.url)+'" target="_blank" rel="noopener" style="color:#ff7587;align-self:center">Abrir grupo</a><button class="danger" data-rm-group="'+esc(g.id)+'">Eliminar</button></div></article>').join(''):'<div class="empty">No has añadido grupos.</div>';
+ $('groups-list').querySelectorAll('[data-rm-group]').forEach(b=>b.onclick=async()=>{if(confirm('¿Eliminar este grupo?')){await remove('groups',b.dataset.rmGroup);await render();}});
+ const map=new Map(cs.map(c=>[c.id,c]));
+ ts.sort((a,b)=>(a.createdAt||'').localeCompare(b.createdAt||''));
+ $('queue').innerHTML=ts.length?ts.map(t=>{const c=map.get(t.campaignId);const done=t.status==='done';return '<article class="item"><strong>'+esc(c?.title||'Campaña')+'</strong><p>'+esc(t.groupName)+' · '+(t.reminder?esc(new Date(t.reminder).toLocaleString()):'Sin recordatorio')+'</p><p>'+esc((c?.text||'').slice(0,180))+'</p><span class="pill">'+(done?'PUBLICADA':'PENDIENTE')+'</span><div class="actions">'+(done?'':'<button data-prepare="'+esc(t.id)+'">Copiar texto y abrir grupo</button><button class="secondary" data-done="'+esc(t.id)+'">Marcar publicada</button>')+'<button class="danger" data-rm-task="'+esc(t.id)+'">Quitar</button></div></article>';}).join(''):'<div class="empty">Todavía no hay publicaciones en cola.</div>';
+ $('queue').querySelectorAll('[data-prepare]').forEach(b=>b.onclick=()=>prepare(b.dataset.prepare));
+ $('queue').querySelectorAll('[data-done]').forEach(b=>b.onclick=async()=>{const t=(await all('tasks')).find(x=>x.id===b.dataset.done);if(t){t.status='done';t.doneAt=new Date().toISOString();await put('tasks',t);await render();}});
+ $('queue').querySelectorAll('[data-rm-task]').forEach(b=>b.onclick=async()=>{await remove('tasks',b.dataset.rmTask);await render();});
+}
+$('group-form').addEventListener('submit',async e=>{e.preventDefault();const name=$('gname').value.trim(),url=$('gurl').value.trim();try{const u=new URL(url);if(!['facebook.com','www.facebook.com','m.facebook.com','web.facebook.com'].includes(u.hostname.toLowerCase())||!u.pathname.toLowerCase().startsWith('/groups/'))throw new Error();await put('groups',{id:id(),name,url:u.href});e.target.reset();await render();}catch{alert('Introduce un enlace válido de un grupo de Facebook.');}});
+$('select-all').onclick=()=>{const boxes=[...$('campaign-groups').querySelectorAll('input')];const check=boxes.some(x=>!x.checked);boxes.forEach(x=>x.checked=check);};
+$('campaign').addEventListener('submit',async e=>{e.preventDefault();const gs=await all('groups'),ids=[...$('campaign-groups').querySelectorAll('input:checked')].map(x=>x.value);if(!ids.length){alert('Selecciona al menos un grupo.');return;}const title=$('title').value.trim(),text=$('message').value.trim();const reminder=$('when').value?new Date($('when').value).toISOString():null;const files=chosenFiles.map(f=>({name:f.name,type:f.type,size:f.size,blob:f}));const c={id:id(),title,text,files,createdAt:new Date().toISOString()};await put('campaigns',c);for(const gid of ids){const g=gs.find(x=>x.id===gid);if(g)await put('tasks',{id:id(),campaignId:c.id,groupId:gid,groupName:g.name,groupUrl:g.url,status:'pending',createdAt:new Date().toISOString(),reminder});}e.target.reset();chosenFiles=[];$('media-preview').innerHTML='';$('count').textContent='0 / 5000';await render();document.querySelector('[data-tab="queue"]').click();});
+async function prepare(taskId){const [ts,cs]=await Promise.all([all('tasks'),all('campaigns')]);const t=ts.find(x=>x.id===taskId),c=cs.find(x=>x.id===t?.campaignId);if(!t||!c)return;try{await navigator.clipboard.writeText(c.text);}catch{window.prompt('Copia el texto del anuncio:',c.text);}const files=(c.files||[]).map(x=>x.blob).filter(Boolean);if(files.length&&navigator.share&&navigator.canShare&&navigator.canShare({files})){try{await navigator.share({title:c.title,text:c.text,files});}catch(e){}}window.open(t.groupUrl,'_blank','noopener');}
+function dataUrl(blob){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(blob);});}
+function blobFrom(data){const parts=data.split(',');const mime=(parts[0].match(/data:(.*?);base64/)||[])[1]||'application/octet-stream';const raw=atob(parts[1]);const bytes=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);return new Blob([bytes],{type:mime});}
+$('export').onclick=async()=>{try{const [groups,campaigns,tasks]=await Promise.all([all('groups'),all('campaigns'),all('tasks')]);const out=[];for(const c of campaigns){const fs=[];for(const f of c.files||[])fs.push({name:f.name,type:f.type,size:f.size,data:await dataUrl(f.blob)});out.push({...c,files:fs});}const blob=new Blob([JSON.stringify({app:'RSSHOP AutoPost',groups,campaigns:out,tasks})],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='rsshop-respaldo.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),3000);toast('Respaldo exportado.');}catch(e){toast('No se pudo exportar: '+e.message);}};
+$('choose-import').onclick=()=>$('import-file').click();
+$('import-file').onchange=async()=>{const file=$('import-file').files[0];if(!file)return;try{const x=JSON.parse(await file.text());if(x.app!=='RSSHOP AutoPost'||!Array.isArray(x.groups)||!Array.isArray(x.campaigns)||!Array.isArray(x.tasks))throw new Error('Respaldo no válido');if(!confirm('¿Importar y combinar el respaldo con los datos actuales?'))return;for(const g of x.groups)await put('groups',g);for(const c of x.campaigns){const n={...c,files:(c.files||[]).map(f=>({name:f.name,type:f.type,size:f.size,blob:blobFrom(f.data)}))};await put('campaigns',n);}for(const t of x.tasks)await put('tasks',t);await render();toast('Respaldo importado.');}catch(e){toast('Error: '+e.message);}};
+(async()=>{try{db=await openDb();await render();}catch(e){alert('No se pudo inicializar el almacenamiento del dispositivo: '+e.message);}})();
+</script></body></html>
